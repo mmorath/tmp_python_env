@@ -7,6 +7,7 @@ A simple example how to use pydantic https://pydantic-docs.helpmanual.io/
  * https://www.youtube.com/watch?v=b4iFyrLQQh4  Spinx 
  * https://www.youtube.com/watch?v=0YUdYk5E-w4  #6: Python Docstrings | Python Best Practices
 
+
 # What do you need to play around #
 
 1. Computer any type
@@ -54,3 +55,8 @@ A simple example how to use pydantic https://pydantic-docs.helpmanual.io/
     #deactivatin the virtual enviromen
     (venv) root@ansible:/usr/src/app#deactivate
     ```
+
+# Kubernetes 
+Some intresting articles ...
+  * https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/
+

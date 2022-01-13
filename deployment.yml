@@ -1,0 +1,21 @@
+---
+apiVersion: extension/v1beta1
+kind: Deployment
+metadata:
+  name: tmppythonenv
+spec:
+  replicas: 1
+  tmplate:
+    metadata:
+      app: tmppythonenv
+    spec:
+      containers:
+        - name: tmppythonenv
+          image: ./tmppythonenv
+          ports:
+            - containerPort: 80
+          env:
+          - name : MICROSERVICE_NAME
+            value: "tmppythonenv"
+          - name : MICROSERVICE_VERSION
+            value: "V1.0"
