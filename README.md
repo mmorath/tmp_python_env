@@ -58,5 +58,6 @@ A simple example how to use pydantic https://pydantic-docs.helpmanual.io/
 
 # Kubernetes 
 Some intresting articles ...
+  * https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/
   * https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/
 

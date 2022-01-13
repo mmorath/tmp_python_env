@@ -1,21 +1,24 @@
 ---
-apiVersion: extension/v1beta1
-kind: Deployment
+apiVersion: "V1.0"
+kind: Pod
 metadata:
   name: tmppythonenv
+  labels:
+    name: tmppythonenv
 spec:
-  replicas: 1
-  tmplate:
-    metadata:
-      app: tmppythonenv
-    spec:
-      containers:
-        - name: tmppythonenv
-          image: ./tmppythonenv
-          ports:
-            - containerPort: 80
-          env:
-          - name : MICROSERVICE_NAME
-            value: "tmppythonenv"
-          - name : MICROSERVICE_VERSION
-            value: "V1.0"
+  containers:
+  - name: tmppythonenv
+    image: ./tmppythonenv
+    resources:
+      limits:
+        memory: "128Mi"
+        cpu: "500m"
+    ports:
+      - containerPort: 80
+    env:
+      - name : MICROSERVICE_NAME
+        value: "tmppythonenv"
+      - name : MICROSERVICE_VERSION
+        value: "V1.0"
+  restartPolicy: OnFailure
+  
