@@ -1,5 +1,11 @@
 FROM python:3
 
+# This prevents Python from writing out pyc files
+ENV PYTHONDONTWRITEBYTECODE 1
+
+# This keeps Python from buffering stdin/stdout
+ENV PYTHONUNBUFFERED 1
+
 #run pip install and get all upgrades...
 RUN pip install --upgrade pip
 
