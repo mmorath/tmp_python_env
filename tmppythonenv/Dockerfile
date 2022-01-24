@@ -1,19 +1,39 @@
 FROM python:3
 
-WORKDIR /usr/src/app
+#run pip install and get all upgrades...
+RUN pip install --upgrade pip
 
-#copy only requirement files over
-COPY requirements.txt ./
-COPY LICENSE.md ./
-COPY logger.conf ./
-COPY data.json ./
-COPY env.py ./
-COPY start.py ./
+#RUN adduser worker
+RUN useradd -ms /bin/bash worker
+#change user to worker
+USER worker
+#change to home directory of worker
+WORKDIR /home/worker/
 
-#ENV TERM=xterm
+#install pipenv to local directory of user ...currently active "worker"
+RUN pip install --user -U --no-warn-script-location pipenv  
 
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
+#copy only requirement files over, for simplicity ..
+COPY --chown=worker:worker requirements.txt ./
+COPY --chown=worker:worker LICENSE.md ./
+COPY --chown=worker:worker logger.conf ./
+COPY --chown=worker:worker data.json ./
+COPY --chown=worker:worker env.py ./
+COPY --chown=worker:worker start.py ./
 
+#install with the user the requirements
+RUN pip install --user -r requirements.txt
+
+#add the workder home directory to the path variable, is required because of the command from above..which notifies 
+#about this therefore "--no-warn-script-location pipenv " was added...
+ENV PATH="/home/worker/.local/bin:${PATH}"
+
+#change the owner to worker:worker
+COPY --chown=worker:worker . .
+
+#add a label 
+LABEL maintainer="matthias.morath@liebherr.com" \
+      version="1.0.0"
+
+#finally call python and start the script start.py
 CMD [ "python", "./start.py" ]
-#CMD ["/bin/bash"]
