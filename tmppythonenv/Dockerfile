@@ -1,4 +1,4 @@
-FROM python:3
+FROM python:3.7.3-alpine3.9
 
 # This prevents Python from writing out pyc files
 ENV PYTHONDONTWRITEBYTECODE 1
@@ -13,8 +13,10 @@ RUN pip install --upgrade pip
 RUN useradd -ms /bin/bash worker
 #change user to worker
 USER worker
+
+RUN mkdir /worker
 #change to home directory of worker
-WORKDIR /home/worker/
+WORKDIR /worker/
 
 #install pipenv to local directory of user ...currently active "worker"
 RUN pip install --user -U --no-warn-script-location pipenv  
