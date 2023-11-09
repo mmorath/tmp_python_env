@@ -1,63 +1,87 @@
-# What is it about  #
-A simple example how to use pydantic https://pydantic-docs.helpmanual.io/
-...some intresting links 
- * https://github.com/squidfunk/mkdocs-material
- * https://www.youtube.com/watch?v=X-LbOBAd-xg
- * https://www.youtube.com/watch?v=0pYN6Z-t1-s 
- * https://www.youtube.com/watch?v=b4iFyrLQQh4  Spinx 
- * https://www.youtube.com/watch?v=0YUdYk5E-w4  #6: Python Docstrings | Python Best Practices
+# TMP_PYTHON_ENV
+
+This project is structured to demonstrate the use of two different Python dependency management and packaging tools in separate but similar environments. One environment (`python_venv`) uses `pip` with a virtual environment, which is a traditional method for installing and managing Python packages. Here, `pip` is responsible for installing packages listed in a `requirements.txt` file within an isolated virtual environment. This approach is widely used due to its simplicity and direct integration with Python's ecosystem.
+
+The other environment (`python_poetry`) utilizes `Poetry`, an advanced packaging and dependency management tool. Poetry provides an all-in-one solution for project dependency management, packaging, and publishing. It uses a `pyproject.toml` file to maintain dependencies, which allows for deterministic builds and streamlined package management. Poetry also handles virtual environments internally, eliminating the need for separate environment management.
+
+In summary, both `pip` and `Poetry` serve the purpose of managing project dependencies, but `Poetry` offers additional features for package creation and publishing, improved dependency resolution, and simplifies the configuration with a single `pyproject.toml` file as opposed to multiple files like `requirements.txt` and `setup.py`.
+
+In the beginning i did create a copy of the python_venv folder structure and named it python_poetry. If you want to follow along, please...steps what needs to be done are noted in the following 
+
+To transform the existing Python application using a virtual environment (`python_venv`) to one using Poetry (`python_poetry`), you will need to carry out several steps. Below is a detailed description of how to migrate your `python_venv` project to a `python_poetry` project:
+
+## Prequisits
+
+Install poetry...for this a "install_poetry.sh" script exists 
+with
+  ```sh
+  chmod +x install_poetry.sh 
+  /install_poetry.sh
+  export PATH="$HOME/.local/bin:$PATH"
+  source $HOME/.profile
+  ```
+potry should be installed, Note: You may admin privileages for that 
 
 
-# What do you need to play around #
+1. **Initialize Poetry Project:**
+   In the `python_poetry` directory, run `poetry init`. This command will help you create a new `pyproject.toml` file, which is the configuration file for Poetry. You will be prompted to define the project's dependencies and development dependencies; you can skip this for now if you plan to add them manually from the `requirements.txt`.
 
-1. Computer any type
-2. OS--> Windows, MacOS, Linux
-3. I use VisualCode...but is not a must  https://code.visualstudio.com/
-4. Docker to be installed  --> https://docs.docker.com/desktop/windows/install/
-5. Git...for cloning and contritbuting to this repository http://git-scm.com/book/de/v2/Erste-Schritte-Git-installieren
+2. **Add Dependencies:**
+   Review the `requirements.txt` file in your `python_venv` directory. You will add each listed package to the new Poetry project by running `poetry add <package>` for each dependency. For development dependencies (like testing libraries), use `poetry add --dev <package>`.
 
-# How to clone this repository #
-1. Open git bash 
-    ```bash
-    cd ~
-    mkdir workspace
-    cd workspace 
-    mkdir github
-    cd github
-    git clone https://github.com/mmorath/cisco.git
-    cd cisco
-    code .
-    ```
-# Install some nice plugins for visual code #
-2. Install nice plugins in vcode 
-  * docker
-  * Github
-  * Python
-  * Pylance
-  * YAML
+   For example:
+   ```sh
+   cd python_poetry
+   poetry add requests flask
+   poetry add --dev pytest
+   ```
 
-# First steps in docker-compose 
-    ```bash
-    #check if ocntainer is running
-    docker ps
-    #build ansible docker container using docker-compose
-    docker-compose -f docker-compose-ansible.yml build
-    #start the container
-    docker-compose -f docker-compose-ansible.yml up -d
-    #log into ansible
-    docker exec -it ansible bash
-    ```
-# Inisde of the container 
-    ```bash
-    #activating the virtual enviroment
-    root@ansible:/usr/src/app# source venv/bin/activate
-    (venv) root@ansible:/usr/src/app# 
-    #deactivatin the virtual enviromen
-    (venv) root@ansible:/usr/src/app#deactivate
-    ```
+3. **Configure the Python Version:**
+   Define the Python version that your project is using. You can find this information in the `python_venv` directory, likely within a configuration file or the `Dockerfile`. Specify this version in your `pyproject.toml` under `[tool.poetry.dependencies]` like so:
+   ```toml
+   [tool.poetry.dependencies]
+   python = "^3.8"  # Use your project's Python version
+   ```
 
-# Kubernetes 
-Some intresting articles ...
-  * https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/
-  * https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/
+4. **Migrate Scripts and Configurations:**
+   If you have any scripts or configurations in `installEnv.sh` that are related to setting up the environment, you’ll need to migrate those as well. For example, environment variables can be managed outside of Poetry, but you should ensure that they are correctly set up in the environment where your Poetry-managed application runs.
 
+5. **Update the Dockerfile:**
+   You will need to update the `Dockerfile` in the `python_poetry` directory to use Poetry instead of pip. Here is an example of what the Dockerfile may look like after modification:
+
+   ```Dockerfile
+   FROM python:3.8-slim
+
+   # Set the working directory to /app
+   WORKDIR /app
+
+   # Copy the current directory contents into the container at /app
+   COPY . /app
+
+   # Install Poetry
+   RUN pip install poetry
+
+   # Disable virtual environment creation by poetry
+   # as Docker provides isolation already
+   RUN poetry config virtualenvs.create false
+
+   # Install the project dependencies
+   RUN poetry install --no-dev
+
+   # Run the app
+   CMD ["python", "./src/main.py"]
+   ```
+
+6. **Remove `requirements.txt`:**
+   Once you have verified that your application works with Poetry, you can remove the `requirements.txt` from the `python_poetry` directory, as it is no longer needed.
+
+7. **Update Documentation:**
+   Modify the `README.md` in the `python_poetry` directory to include instructions for setting up the project using Poetry. This should include information on how to install Poetry and how to use it to install the project's dependencies.
+
+8. **Test the Application:**
+   After setting up Poetry and updating the Dockerfile, build your Docker image and run it to ensure that everything works as expected. Test thoroughly to verify that all dependencies are correctly installed and that your application behaves correctly.
+
+9. **Commit Changes:**
+   Once you're satisfied with the setup, commit the changes to your version control system, documenting the migration from `python_venv` to `python_poetry`.
+
+By following these steps, you should be able to successfully migrate your application from using a virtual environment with pip to managing its dependencies with Poetry.
