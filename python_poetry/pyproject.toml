@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "python_poetry"
+version = "0.1.0"
+description = "This is a python template using poetry instead of classic pip"
+authors = ["MMM <kompass_eng_0x@icloud.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+paho-mqtt = "1.5.1"
+pyserial = "3.5"
+six = "1.16.0"
+requests = "2.26.0"
+pyusb = "1.2.1"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.2"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

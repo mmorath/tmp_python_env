@@ -1,0 +1,35 @@
+name: Main Workflow
+
+on:
+  workflow_run:
+    #workflows: ["code_coverage_checks", "dependency_scanning_checks", "docker_checks", "docker_compose_checks", "json_validation_checks", "python_checks", "shell_linting_checks", "yaml_validation_checks"]
+    workflows: ["python_checks"]
+
+    types:
+      - completed
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+      with:
+        ref: 'main'  # Replace with your default branch
+
+    - name: Bump version and push tag
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git tag -a v$(date +'%Y%m%d%H%M%S') -m "Auto-generated tag from GitHub Actions"
+        git push origin --tags
+
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        body: Auto-generated release from GitHub Actions.
+        draft: false
+        prerelease: false

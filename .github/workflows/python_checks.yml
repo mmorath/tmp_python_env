@@ -1,0 +1,75 @@
+name: Python Checks and Auto-fix
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  python-check:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Checkout code with the latest action version
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    # Setup Python with the latest action version
+    - name: Setup Python 3.x
+      uses: actions/setup-python@v3
+      with:
+        python-version: '3.x'
+
+    # Install dependencies
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install black flake8 pycodestyle
+
+    # Auto-formatting with Black
+    - name: Auto-format with Black
+      run: |
+        black --check .
+      continue-on-error: true
+
+    # Apply auto-formatting with Black if needed
+    - name: Apply auto-formatting with Black
+      run: |
+        black .
+      if: failure()
+
+    # Linting with Flake8
+    - name: Lint with Flake8
+      run: |
+        flake8 .
+      continue-on-error: true
+
+    # Style checking with PEP8 (pycodestyle)
+    - name: Check style with PEP8 (pycodestyle)
+      run: |
+        pycodestyle --max-line-length=180 .
+      continue-on-error: true
+
+    # Commit changes made by Black
+    - name: Commit changes
+      if: failure()
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add -A
+        git commit -m "Apply Black formatting" -a || echo "No changes to commit"
+        git push
+      continue-on-error: true
+
+    # Manual intervention if linting or formatting failed
+    - name: Manual Intervention Required
+      if: failure()
+      run: echo "Manual intervention required. Review the linting and formatting errors."
+
+    # Indicate readiness for review/merge if all checks pass
+    - name: Ready for Review/Merge
+      if: success()
+      run: echo "All checks passed. Ready for review or merge."
